@@ -63,7 +63,7 @@ def _validar_periodo(c, clima):
 
 
 def simular(c, plano, clima):
-    plantio,fim=_validar_periodo(c,clima)
+    plantio,fim=_validar_periodo(c,clima["historico"])
     genes={g["id"]:g for g in c["genotipos"]}
     solos={s["id"]:s for s in c["solos"]}
     pragas={p["id"]:p for p in c.get("pragas",[])}
