@@ -46,3 +46,24 @@
 - Pendente da Auditoria 03: confirmar o workflow GitHub Actions no PR, reexecutar pipeline científico completo no checkout, reconferir as tabelas dos artigos originais, corrigir a persistência em longo prazo apenas com mecanismo e fonte sustentados, harmonizar TCC v8 com código/memória do fork, regenerar passagem de bastão.
 
 - 14/11/2026 — Em branch isolada, acrescentada ferramenta **operacional**: motor existente roda 12 combinações e eventos de danos adicionais, entrega evolução mensal, resultados a 84 meses, diferenças para histórico/controle e interação tripla genótipo×solo×clima; parser CLIMBra por GCM e extrator/normalizador Earth Engine. Interface permite preparar configuração, carregar CSV reais e filtrar resultados/fenotipagem. Testes automatizados só com clima/solo artificiais **como fixtures de software**, não resultados científicos. Falta aplicar em dados reais da LD, avaliação de precisão contra inventário e checagem com r3PG em R.
+
+
+## Atualização de progresso — 14/11/2026
+### Feito nesta etapa documental
+- Elaborado `planejamento/MAPA_MESTRE_TCC_AKADEMIA.md`, mapa mestre com pergunta integradora, objetivos, arquitetura, desenho 2×2×3, pacotes P0–P11, dependências, riscos e critérios de aceite.
+- Aberto PR #4: https://github.com/tomdeatj-commits/Akademia/pull/4. Branch: `docs/mapa-mestre-tcc-akademia`. Commit do mapa: `4fd2d13331aa2b4cd5636eab321066db0e10093b`.
+- Atualização é de planejamento/documentação. Não houve alteração de equações, parâmetros, dados de entrada, resultados ou motor científico. Nenhuma nova simulação foi executada nesta etapa.
+### Falta — ordem de execução revisada
+1. Revisar e mesclar PR #4 somente após auditoria do autor.
+2. Fazer checkout completo e executar `python3 ferramentas/pipeline.py verificar`; confirmar CI e reexecutar testes/pipeline conforme instruções do AGENTS.md.
+3. Regenerar passagem e contexto empacotado com `python3 ferramentas/gerar_passagem.py` no checkout completo; confirmar o conteúdo produzido e registrar commit/log.
+4. Fechar P1: reconciliação das fontes primárias, auditoria de evidências e matriz observado×previsto; preservar ressalva de persistência de longo prazo após desfolha total precoce.
+5. Fechar P2: busca recente e fichas de Stape/Hélio Garcia Leite; identificar genótipos contrastantes e verificar disponibilidade de parâmetros 3-PG comparáveis.
+6. Fechar P3/P4: definir ponto regional sem alegar talhão da LD; extrair solo/água e CLIMBra/histórico com metadados, unidades, resolução e incerteza.
+7. Executar P5: 12 combinações, horizonte de sete anos, somente após congelar entradas e protocolo.
+8. Acrescentar P6/P7/P8 como módulos separados e documentados; avaliar em P9 com observações independentes apropriadas.
+9. Consolidar P10/P11 apenas com funcionalidades e resultados efetivamente verificados.
+### Bloqueios e limites
+- Dados privados da LD, clones, inventários e parcelas: não disponíveis/presumidos; escopo territorial público apenas.
+- Dados reais CLIMBra, genótipos, CAD/solo e observações GEDI/Sentinel precisam de extração e auditoria antes de simular.
+- Fixtures sintéticas usadas nos testes existentes não constituem evidência científica nem validação do modelo.

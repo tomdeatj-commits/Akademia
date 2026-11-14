@@ -167,3 +167,63 @@ no modelo ecofisiológico 3-PG (r3PG v0.1.7, 3-PGpjs, porta Python verificada) p
 1. Sem execução de código: redija o texto, marcando [CONFERIR] em números ainda não gerados. Nunca invente resultados.
 2. Com código: siga "Falta (em ordem)" e rode `python3 ferramentas/pipeline.py <etapa>`.
 3. Ao fim de cada passo: atualize `memoria/`, rode este gerador e faça commit.
+
+
+---
+# ADENDO DE PASSAGEM DE BASTÃO — 14/11/2026
+
+> **Nota de atualização:** o corpo histórico acima foi gerado em 02/11 e contém contexto antigo. Este adendo registra as mudanças verificadas em 14/11/2026. A regeneração integral pelo script oficial ainda está pendente de checkout completo; não tratar a contagem antiga de tokens como atual.
+
+## Estado mais recente do trabalho
+- Repositório: fork privado `tomdeatj-commits/Akademia`. A branch de documentação é `docs/mapa-mestre-tcc-akademia`.
+- Mapa mestre: `planejamento/MAPA_MESTRE_TCC_AKADEMIA.md`, commit `4fd2d13331aa2b4cd5636eab321066db0e10093b`.
+- PR #4 aberto, ainda não mesclado: https://github.com/tomdeatj-commits/Akademia/pull/4.
+- Nesta atualização, o mapa foi registrado como planejamento. Não houve execução de código, nova simulação, calibração, alteração do motor, mudança de parâmetros ou geração de resultados científicos.
+
+## Escopo consolidado
+O estudo aprovado contempla 2 genótipos × 2 classes texturais de solo × 3 condições climáticas (histórico, SSP2-4.5 e SSP5-8.5), em sete anos. A região publicamente documentada de atuação da LD Celulose é referência territorial. **Não presumir dados, parcelas, inventários, clones, análises de solo, dados meteorológicos ou autorização da empresa.** Se dados forem obtidos posteriormente, registrar origem, autorização, metadados e compatibilidade.
+
+Pragas/desfolha são inicialmente análises de sensibilidade separadas do fatorial central. Fenotipagem com GEDI, Sentinel-2 e Earth Engine deve respeitar qualidade, footprint/pixel, datas e incertezas. Essas fontes não identificam por si só clone, ocorrência de praga, IAF ou produtividade de talhão.
+
+## Arquitetura e frentes
+O mapa organiza 12 pacotes:
+- P0 governança e rastreabilidade;
+- P1 auditoria do módulo de desfolha;
+- P2 literatura Stape/Hélio e seleção de genótipos;
+- P3 território e solos;
+- P4 clima histórico/futuro;
+- P5 fatorial genótipo×solo×clima;
+- P6 pragas e danos;
+- P7 GEDI/Earth Engine/fenotipagem;
+- P8 alometria, DAP, altura, volume e produtos;
+- P9 avaliação e validação;
+- P10 plataforma Akademia;
+- P11 redação e defesa.
+
+## Próximas ações obrigatórias
+1. Revisar o PR #4 e mesclar somente após aprovação do autor.
+2. Obter checkout completo do repositório e executar `python3 ferramentas/pipeline.py verificar`.
+3. Executar `python3 ferramentas/gerar_passagem.py` para regenerar `PASSAGEM_DE_BASTAO.md` e `CONTEXTO_EMPACOTADO.md`; conferir diferenças e registrar commit. O gerador foi lido nesta etapa, mas não executado.
+4. Retomar auditoria do módulo original e matriz observado×previsto, sem confundir calibração/teste interno com validação independente.
+5. Atualizar revisão bibliográfica com trabalhos recentes de Stape e Hélio Garcia Leite; documentar fontes primárias, parâmetros, domínio e incertezas.
+6. Selecionar genótipos contrastantes somente com evidência experimental e parâmetros compatíveis disponíveis.
+7. Obter e auditar entradas públicas de solo/água e clima; depois congelar protocolo e executar os 12 cenários.
+8. Integrar danos, fenotipagem e alometria em módulos separados, com critérios de aceite e observações independentes adequadas.
+
+## Regras de interpretação
+- TESTED significa teste técnico, não validação biológica.
+- Fixtures sintéticas demonstram funcionamento do software, não produtividade real.
+- GEDI/Sentinel são observações/proxies com limitações espaciais e temporais.
+- Cenários de pragas sem série local são hipóteses simuladas, não mapas de infestação.
+- Não alegar novidade, superioridade genética ou capacidade preditiva sem comparação apropriada e evidência independente.
+- Preservar o motor e a reprodutibilidade do módulo legado; toda alteração científica exige fonte, teste e auditoria.
+
+## Referências internas essenciais
+- `AGENTS.md` — regras obrigatórias para agentes.
+- `memoria/contexto_ativo.md` — contexto atual.
+- `memoria/progresso.md` — feito, pendências e bloqueios.
+- `planejamento/MAPA_MESTRE_TCC_AKADEMIA.md` — plano completo P0–P11.
+- `experimentos/integrado/README.md` — experimento genótipo×solo×clima.
+- `docs/ESCOPO_TCC_LD_REGIONAL.md` — delimitação territorial e de dados.
+- `docs/AUDITORIA_03_RASTREABILIDADE.md` — auditoria de evidências.
+
