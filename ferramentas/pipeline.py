@@ -12,6 +12,8 @@ PY = sys.executable
 ETAPAS = {
     "verificar": [[PY, "-c", "import numpy, pandas, sklearn; print('python ok')"], ["node", "--version"]],
     "testes": [[PY, "-m", "pytest", "-q", "modelo/testes"]],
+    "evidencias": [[PY, "-m", "unittest", "discover", "-s", "ferramentas", "-p", "test_auditar_evidencias.py"],
+                   [PY, "ferramentas/auditar_evidencias.py"]],
     "calibracao": [[PY, "calibrar.py", "0.999"], [PY, "calibrar.py", "0.99"], [PY, "calibrar_gamma.py"], [PY, "validacao_cruzada.py"],
                    [PY, "auditoria_calibracao.py"], [PY, "testes_adicionais.py"], [PY, "validacao_globulus.py"], [PY, "teste_oliveira2014.py"]],
     "experimentos": [[PY, "experimentos/run_experimentos.py"], [PY, "experimentos/controles.py"]],
@@ -28,16 +30,31 @@ ETAPAS = {
     "passagem": [[PY, "ferramentas/gerar_passagem.py"]],
 }
 CWD = {"calibracao": RAIZ / "calibracao", "tcc": RAIZ / "tcc_docx"}
-ORDEM = ["verificar", "testes", "calibracao", "experimentos", "indicadores", "analises", "danos", "biomas", "possibilidades", "tabelas", "plataforma", "auditoria", "tcc"]
+ORDEM = ["verificar", "testes", "evidencias", "calibracao", "experimentos", "indicadores", "analises", "danos", "biomas", "possibilidades", "tabelas", "plataforma", "auditoria", "tcc"]
 
 
 def commit(msg):
-    if (RAIZ / ".git").exists():
-        subprocess.run(["git", "-C", str(RAIZ), "add", "-A"], capture_output=True)
-        subprocess.run(["git", "-C", str(RAIZ), "commit", "-q", "-m", msg], capture_output=True)
-        # salva no GitHub (repositório privado Akademia); falha de rede não interrompe o trabalho
-        r = subprocess.run(["git", "-C", str(RAIZ), "push", "-q", "origin", "HEAD:main"], capture_output=True, text=True, timeout=600)
-        print("[git] enviado ao GitHub" if r.returncode == 0 else f"[git] push falhou (fica salvo localmente): {r.stderr.strip()[:200]}")
+    """Publicação opt-in: nunca enviar automaticamente à branch principal."""
+    if "--publish" not in sys.argv[1:]:
+        return
+    if not (RAIZ / ".git").exists():
+        raise RuntimeError("Use --publish somente em checkout Git local")
+    branch = subprocess.run(["git", "-C", str(RAIZ), "branch", "--show-current"],
+                            capture_output=True, text=True, check=True).stdout.strip()
+    if not branch or branch in ("main", "master"):
+        raise RuntimeError("Publicação bloqueada em main/master; selecione uma branch de trabalho")
+    subprocess.run(["git", "-C", str(RAIZ), "add", "-A"], check=True)
+    staged = subprocess.run(["git", "-C", str(RAIZ), "diff", "--cached", "--quiet"])
+    if staged.returncode == 0:
+        print("[git] nenhuma alteração a publicar")
+        return
+    if staged.returncode != 1:
+        raise RuntimeError("Falha na inspeção das alterações preparadas")
+    subprocess.run(["git", "-C", str(RAIZ), "commit", "-m", msg], check=True)
+    subprocess.run(["git", "-C", str(RAIZ), "push", "origin", f"HEAD:{branch}"],
+                   check=True, timeout=600)
+    print(f"[git] publicado em {branch}")
+
 
 
 def rodar(etapa):
@@ -52,13 +69,13 @@ def rodar(etapa):
             subprocess.run([PY, "ferramentas/gerar_passagem.py"], cwd=RAIZ)
             sys.exit(r.returncode)
     print(f"[{etapa}] ok em {time.time() - t0:.0f} s")
-    if etapa != "passagem":
+    if etapa not in ("passagem", "verificar", "testes", "evidencias"):
         subprocess.run([PY, "ferramentas/gerar_passagem.py"], cwd=RAIZ)
         commit(f"pipeline: etapa {etapa} concluída")
 
 
 if __name__ == "__main__":
-    pedidas = sys.argv[1:] or ["verificar"]
+    pedidas = [a for a in sys.argv[1:] if a != "--publish"] or ["verificar"]
     for e in (ORDEM if pedidas == ["tudo"] else pedidas):
         if e not in ETAPAS:
             sys.exit(f"Etapa desconhecida: {e}. Opções: {', '.join(ETAPAS)}, tudo")
