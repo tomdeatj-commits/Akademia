@@ -57,10 +57,10 @@ Os ataques são experiências de sensibilidade adicionais. GEDI, Sentinel-2 e me
 </section>
 
 <section><h2>2 · Preparar experimento com fontes rastreáveis</h2>
-<p class="note">Este formulário produz o JSON para o orquestrador Python. A1 e C5 são referências disponíveis, não prova de genótipos tolerantes da LD Celulose. Substitua-os por parametrizações reais antes da conclusão científica.</p>
+<p class="note">Este formulário produz o JSON para o orquestrador Python. A1 e C5 são referências disponíveis, não representa genótipos nem talhões identificados da LD Celulose. Substitua-os por parametrizações reais antes da conclusão científica.</p>
 <div class="grid">
-<label>Latitude do talhão<input id="lat" type="number" step="any" placeholder="coordenada medida"></label>
-<label>Longitude do talhão<input id="lon" type="number" step="any" placeholder="coordenada medida"></label>
+<label>Latitude da referência regional<input id="lat" type="number" step="any" placeholder="coordenada pública/documentada"></label>
+<label>Longitude da referência regional<input id="lon" type="number" step="any" placeholder="coordenada pública/documentada"></label>
 <label>Fonte da localização<input id="fonteLocal" placeholder="inventário / mapa / empresa"></label>
 <label>Densidade inicial (árvores/ha)<input id="dens" type="number" min="1" step="any"></label>
 <label>Fonte da densidade<input id="fonteDens"></label>
@@ -93,7 +93,7 @@ Os ataques são experiências de sensibilidade adicionais. GEDI, Sentinel-2 e me
 </section>
 
 <section><h2>3 · Fenotipagem e dados remotos</h2>
-<p>O <b>Earth Engine</b> extrai RH98, PAI, AGBD, NDVI e NDRE por talhão e mês. Um importador padroniza os CSVs para cruzá-los com os cenários. A comparação direta com crescimento permanece restrita a variáveis efetivamente equivalentes.</p>
+<p>O <b>Earth Engine</b> extrai RH98, PAI, AGBD, NDVI e NDRE em áreas públicas de referência ou talhões documentados. Um importador padroniza os CSVs para cruzá-los com os cenários. A comparação direta com crescimento permanece restrita a variáveis efetivamente equivalentes.</p>
 <div class="grid">
 <div><b>GEDI L2A/L2B/L4A</b><div class="note">Estrutura, índice de área de plantas e biomassa aérea estimada; dependem de pegadas válidas.</div></div>
 <div><b>Sentinel-2</b><div class="note">Séries NDVI e NDRE para fenotipagem temporal; anomalia espectral não prova praga.</div></div>
@@ -102,7 +102,7 @@ Os ataques são experiências de sensibilidade adicionais. GEDI, Sentinel-2 e me
 <p><a href="https://code.earthengine.google.com/" target="_blank" rel="noopener">Abrir o Code Editor do Earth Engine</a> · <a href="https://github.com/tomdeatj-commits/Akademia/tree/feature/gedi-earthengine-observacoes/sensoriamento">Ver extrator e importador no repositório</a></p>
 <label>Fenotipagem importada do Earth Engine (CSV)<input type="file" id="fenotipos" accept=".csv,text/csv"></label>
 <p id="fenotipoStatus" class="note" role="status">Nenhum CSV de fenotipagem carregado.</p>
-<div class="scroll"><table aria-label="Medições remotas por talhão"><thead><tr><th>Talhão</th><th>Genótipo</th><th>Solo</th><th>Mês</th><th>Variável</th><th>Valor</th><th>Desvio sazonal</th><th>Origem</th></tr></thead><tbody id="linhasFenotipos"></tbody></table></div>
+<div class="scroll"><table aria-label="Medições remotas por área de referência"><thead><tr><th>Talhão</th><th>Genótipo</th><th>Solo</th><th>Mês</th><th>Variável</th><th>Valor</th><th>Desvio sazonal</th><th>Origem</th></tr></thead><tbody id="linhasFenotipos"></tbody></table></div>
 </section>
 </main>
 <footer class="note">Ferramenta de apoio à pesquisa. Resultados computacionais não constituem validação de campo. Fórmulas e parâmetros pertencem ao motor 3-PG preservado.</footer>
@@ -242,7 +242,7 @@ $('baixarConfig').addEventListener('click',()=>{
   const numeric=['lat','lon','dens','fr','cadAreia','cadArgila'];
   if(numeric.some(k=>!Number.isFinite(+$(k).value)))throw Error('Números inválidos');
   if(+$('fr').value<0||+$('fr').value>1||+$('dens').value<=0||+$('cadAreia').value<=0||+$('cadArgila').value<=0)throw Error('Valores de solo/densidade/FR fora do intervalo');
-  const c={titulo:'Akademia - experimento integrado',sitio:{id:'ld_celulose_talhao',
+  const c={titulo:'Akademia - experimento integrado',sitio:{id:'referencia_regional_triangulo_mineiro',
     latitude:+$('lat').value,longitude:+$('lon').value,fonte:$('fonteLocal').value},
     plantio:'2015-01',idade_final_meses:84,densidade_inicial_ha:+$('dens').value,
     fonte_densidade:$('fonteDens').value,fertilidade_fr:+$('fr').value,fonte_fr:$('fonteFr').value,
@@ -256,7 +256,7 @@ $('baixarConfig').addEventListener('click',()=>{
       periodo_referencia:$('periodoBase').value,periodo_futuro:$('periodoFuturo').value,
       geadas:'dias_futuros_no_delta'},pragas:ataques};
   baixar('experimento_integrado.json',JSON.stringify(c,null,2),'application/json;charset=utf-8');
-  $('statusconfig').textContent='Configuração exportada. Falta conferir que os parâmetros correspondem aos genótipos da LD, e fornecer os CSVs climáticos reais.';
+  $('statusconfig').textContent='Configuração exportada. Falta conferir a procedência dos parâmetros científicos e fornecer os CSVs climáticos públicos.';
  }catch(e){$('statusconfig').textContent='Verifique: '+e.message}
 });
 </script></body></html>
