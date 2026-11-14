@@ -26,14 +26,17 @@ def integrar(arquivos,sitio_id):
     falta=set(COLUNAS)-set(df)
     if falta: raise ValueError(f"Exportação incompleta: {sorted(falta)}")
     if df.empty: raise ValueError("Não há observações válidas para importar")
-    if df[list(COLUNAS)].isna().any().any():
-        raise ValueError("Há talhões sem genótipo/solo/valor; complete os metadados antes de importar")
+    essenciais=("talhao_id","ano_mes","produto","variavel","valor","n_pixels_validos","unidade","origem")
+    if df[list(essenciais)].isna().any().any():
+        raise ValueError("Observações precisam de área, data, produto, variável, valor e fonte")
+    # Genótipo/solo podem ser desconhecidos em polígonos públicos regionais.
+    # Campos vazios permanecem ausentes: jamais atribuir G1/G2 ou textura automaticamente.
     df["n_pixels_validos"]=pd.to_numeric(df.n_pixels_validos,errors="raise")
     df["valor"]=pd.to_numeric(df.valor,errors="raise")
     if (df.n_pixels_validos<=0).any() or not df.valor.map(math.isfinite).all():
         raise ValueError("Amostras não finitas ou sem pixels válidos")
-    if not set(df.genotipo).issubset({"G1","G2"}) or not set(df.solo).issubset({"arenoso","argiloso"}):
-        raise ValueError("Atribua G1/G2 e textura aos talhões antes de importar")
+    if not set(df.genotipo.dropna()).issubset({"G1","G2"}) or not set(df.solo.dropna()).issubset({"arenoso","argiloso"}):
+        raise ValueError("Classes conhecidas devem ser G1/G2 e arenoso/argiloso; deixe vazio o que não for conhecido")
     if pd.to_datetime(df.ano_mes+"-01",format="%Y-%m-%d",errors="coerce").isna().any():
         raise ValueError("Data inválida; formato esperado YYYY-MM")
     if any((r.produto,r.variavel) not in PRODUTOS for r in df.itertuples()):
@@ -45,6 +48,9 @@ def integrar(arquivos,sitio_id):
     df["sitio_id"]=sitio_id
     df["comparavel"]="nao"
     df["tipo_evidencia"]="proxy_indireto_sem_ajuste"
+    df["escopo"]="area_referencia_sem_identidade_genetica"
+    dados_identificados=df.genotipo.notna() & df.solo.notna()
+    df.loc[dados_identificados,"escopo"]="area_identificada_na_fonte_sem_validacao"
     df=df.sort_values(["talhao_id","ano_mes","variavel"])
     # Anomalia sazonal relativa a anos anteriores do MESMO talhão/mês.
     # Não cria limiar de praga ou uma medida inexistente de IAF.
