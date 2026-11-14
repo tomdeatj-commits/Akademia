@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Akademia · Experimento integrado</title>
+<style>
+:root{--bg:#f5f4ec;--txt:#20352c;--line:#c8d4cc;--accent:#146b4d;--pale:#e5efe8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.55 system-ui,-apple-system,sans-serif}
+header,main,footer{max-width:1100px;margin:auto;padding:22px}header{border-bottom:1px solid var(--line)}
+a{color:var(--accent)}h1{font-size:clamp(1.65rem,4vw,2.35rem);margin:.2em 0}h2{font-size:1.23rem;margin:0 0 12px}
+h3{font-size:1rem}.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#42725f}
+section{background:white;border:1px solid var(--line);padding:20px;border-radius:14px;margin:16px 0}
+p{max-width:86ch}small,.note{color:#52665c}.note{font-size:13px}label{display:flex;flex-direction:column;font-size:13px;font-weight:650;gap:5px}
+input,select,textarea,button{font:inherit}input,select,textarea{padding:10px;border:1px solid #9caea3;border-radius:7px;background:#fff;max-width:100%;width:100%;color:var(--txt)}
+input[type=file]{max-width:450px}textarea{min-height:80px}
+button{border:0;border-radius:8px;background:var(--accent);color:white;padding:11px 16px;cursor:pointer;font-weight:650}
+button:disabled{opacity:.5;cursor:default}button.secondary{background:#e3eee6;color:#164e35}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:9px;margin:12px 0}
+.metric{background:var(--pale);border-radius:8px;padding:12px}.metric b{font-size:1.25rem}.metric small{display:block;font-size:11px}
+.scroll{overflow:auto}table{border-collapse:collapse;width:100%;font-size:12px;min-width:730px}
+td,th{padding:8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{background:#eff5ef}#status,#statusconfig{white-space:pre-line;font-size:13px}
+#grafico{width:100%;height:300px;border:1px solid var(--line);background:#fcfdfb;border-radius:8px}
+svg text{font-family:system-ui,sans-serif;font-size:11px;fill:#476155}
+summary{cursor:pointer;font-weight:700}details{margin:16px 0}
+@media(max-width:600px){header,main,footer{padding:12px}section{padding:14px}}
+</style></head><body>
+<header><div class="eyebrow">Akademia · módulo operacional</div>
+<h1>Genótipo × solo × clima × danos</h1>
+<p>Aprovado: <b>2 genótipos × 2 texturas × 3 cenários climáticos = 12 condições centrais</b>.
+Os ataques são experiências de sensibilidade adicionais. GEDI, Sentinel-2 e medições de campo compõem a fenotipagem — não são rótulos automáticos de praga.</p>
+<a href="./index.html">Voltar ao simulador 3-PG</a></header>
+<main>
+<section><h2>1 · Abrir resultados reais da execução</h2>
+<p class="note">Não existem simulações pré-carregadas. Execute o motor com os dados científicos e selecione os CSVs gerados. O navegador só lê arquivos locais selecionados por você.</p>
+<div class="grid">
+<label>Resultados finais aos 84 meses<input id="finais" type="file" accept=".csv,text/csv"></label>
+<label>Séries mensais (opcional)<input id="mensal" type="file" accept=".csv,text/csv"></label>
+</div>
+<p id="status" role="status">Nenhum resultado carregado.</p>
+<div class="grid" id="filtros" hidden>
+<label>Genótipo<select id="genotipo"></select></label>
+<label>Solo<select id="solo"></select></label>
+<label>Clima<select id="clima"></select></label>
+<label>Dano<select id="dano"></select></label>
+</div>
+<div class="metrics" id="metricas" aria-live="polite"></div>
+<div class="scroll"><table id="tabela" aria-label="Resultados de cenários"><thead><tr id="colunas"></tr></thead><tbody id="linhas"></tbody></table></div>
+<p><button class="secondary" id="exportar" disabled>Exportar seleção CSV</button></p>
+<details><summary>Interação genótipo × solo × clima e modulação por pragas</summary>
+<label>Interações calculadas pelo motor<input type="file" id="interacoes" accept=".csv,text/csv"></label>
+<p class="note">A interação tripla é um contraste entre diferenças G2−G1, solos e climas. Não é teste de significância nem efeito observado em campo.</p>
+<div class="scroll"><table aria-label="Contrastes fatoriais"><thead><tr><th>SSP</th><th>Dano</th><th>Variável</th><th>Interação tripla</th><th>Modulação adicional pelo dano</th></tr></thead><tbody id="linhasInteracoes"></tbody></table></div></details>
+<details><summary>Curvas mensais do cenário selecionado</summary>
+<label>Identificador do cenário<select id="cenario"></select></label>
+<svg id="grafico" viewBox="0 0 800 300" role="img" aria-label="Curvas mensais por variável"></svg>
+<p class="note">Volume (m³/ha), biomassa foliar (Mg/ha) e IAF são exibidos em eixos próprios normalizados, para comparar as trajetórias, não as magnitudes.</p></details>
+</section>
+
+<section><h2>2 · Preparar experimento com fontes rastreáveis</h2>
+<p class="note">Este formulário produz o JSON para o orquestrador Python. A1 e C5 são referências disponíveis, não representa genótipos nem talhões identificados da LD Celulose. Substitua-os por parametrizações reais antes da conclusão científica.</p>
+<div class="grid">
+<label>Latitude da referência regional<input id="lat" type="number" step="any" placeholder="coordenada pública/documentada"></label>
+<label>Longitude da referência regional<input id="lon" type="number" step="any" placeholder="coordenada pública/documentada"></label>
+<label>Fonte da localização<input id="fonteLocal" placeholder="inventário / mapa / empresa"></label>
+<label>Densidade inicial (árvores/ha)<input id="dens" type="number" min="1" step="any"></label>
+<label>Fonte da densidade<input id="fonteDens"></label>
+<label>Fertilidade FR (0 a 1)<input id="fr" type="number" min="0" max="1" step="0.01"></label>
+<label>Fonte FR<input id="fonteFr"></label>
+<label>CAD arenoso (mm)<input id="cadAreia" type="number" step="any" min="1"></label>
+<label>Fonte do solo arenoso<input id="fonteAreia"></label>
+<label>CAD argiloso (mm)<input id="cadArgila" type="number" step="any" min="1"></label>
+<label>Fonte do solo argiloso<input id="fonteArgila"></label>
+<label>Material G1 (código existente)<input id="g1" placeholder="A1"></label>
+<label>Fonte parâmetros G1<input id="fonteG1"></label>
+<label>Material G2 (código existente)<input id="g2" placeholder="C5"></label>
+<label>Fonte parâmetros G2<input id="fonteG2"></label>
+<label>Período histórico CLIMBra<input id="periodoBase" placeholder="ex.: 1981–2010"></label>
+<label>Período futuro CLIMBra<input id="periodoFuturo" placeholder="ex.: 2041–2070"></label>
+</div>
+<h3>Adicionar eventos de pragas e doenças</h3>
+<p class="note">Cada evento é uma imposição mecanística; intensidade e momento devem estar fundamentados ou explicitamente marcados como hipótese. 100% não é aceito por este motor.</p>
+<div class="grid">
+<label>Agente / cenário<input id="agente" placeholder="ex.: ataque experimental"></label>
+<label>Mecanismo<select id="mecanismo"><option value="desfolha">Remoção de folhas</option><option value="eficiencia">Redução da eficiência fotossintética</option><option value="mortalidade">Mortalidade imposta</option></select></label>
+<label>Idade do evento (meses)<input id="idade" type="number" min="1" max="84"></label>
+<label>Intensidade (%)<input id="percent" type="number" min="0" max="99.9" step="any"></label>
+<label>Fonte / justificativa<input id="fontePraga"></label>
+</div>
+<p><button type="button" class="secondary" id="addPraga">Adicionar cenário</button></p>
+<div id="pragasLista" class="note"></div>
+<p><button id="baixarConfig">Baixar configuração JSON</button></p>
+<div id="statusconfig" role="status"></div>
+</section>
+
+<section><h2>3 · Fenotipagem e dados remotos</h2>
+<p>O <b>Earth Engine</b> extrai RH98, PAI, AGBD, NDVI e NDRE em áreas públicas de referência ou talhões documentados. Um importador padroniza os CSVs para cruzá-los com os cenários. A comparação direta com crescimento permanece restrita a variáveis efetivamente equivalentes.</p>
+<div class="grid">
+<div><b>GEDI L2A/L2B/L4A</b><div class="note">Estrutura, índice de área de plantas e biomassa aérea estimada; dependem de pegadas válidas.</div></div>
+<div><b>Sentinel-2</b><div class="note">Séries NDVI e NDRE para fenotipagem temporal; anomalia espectral não prova praga.</div></div>
+<div><b>Campo</b><div class="note">Inventários, medições de IAF, altura e volume com protocolo comparável alimentam o confronto.</div></div>
+</div>
+<p><a href="https://code.earthengine.google.com/" target="_blank" rel="noopener">Abrir o Code Editor do Earth Engine</a> · <a href="https://github.com/tomdeatj-commits/Akademia/tree/feature/gedi-earthengine-observacoes/sensoriamento">Ver extrator e importador no repositório</a></p>
+<label>Fenotipagem importada do Earth Engine (CSV)<input type="file" id="fenotipos" accept=".csv,text/csv"></label>
+<p id="fenotipoStatus" class="note" role="status">Nenhum CSV de fenotipagem carregado.</p>
+<div class="scroll"><table aria-label="Medições remotas por área de referência"><thead><tr><th>Talhão</th><th>Genótipo</th><th>Solo</th><th>Mês</th><th>Variável</th><th>Valor</th><th>Desvio sazonal</th><th>Origem</th></tr></thead><tbody id="linhasFenotipos"></tbody></table></div>
+</section>
+</main>
+<footer class="note">Ferramenta de apoio à pesquisa. Resultados computacionais não constituem validação de campo. Fórmulas e parâmetros pertencem ao motor 3-PG preservado.</footer>
+<script>
+const $=id=>document.getElementById(id);
+let finais=[],serie=[],selecionados=[],ataques=[];
+const COLS=['id','genotipo','solo','clima','dano','volume','biom_stem','biom_foliage','lai','stems_n'];
+const fmt=(x,n=2)=>Number.isFinite(+x)?Number(x).toLocaleString('pt-BR',{maximumFractionDigits:n}):'—';
+function csv(text) {
+  const linhas=[];let linha=[],cel='',aspas=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(c==='"'){if(aspas&&text[i+1]==='"'){cel+='"';i++}else aspas=!aspas}
+    else if(c===','&&!aspas){linha.push(cel);cel=''}
+    else if((c==='\n'||c==='\r')&&!aspas){if(c==='\r'&&text[i+1]==='\n')i++;
+      linha.push(cel);cel='';if(linha.some(x=>x!==''))linhas.push(linha);linha=[]}
+    else cel+=c}
+  if(cel||linha.length){linha.push(cel);linhas.push(linha)}
+  if(!linhas.length)return[];
+  const head=linhas.shift().map(x=>x.trim());
+  return linhas.map(r=>Object.fromEntries(head.map((h,i)=>[h,r[i]??''])));
+}
+async function lerArquivo(id){const f=$(id).files?.[0];return f?csv(await f.text()):[]}
+function limpar(el){el.replaceChildren()}
+function option(sel,v){const x=document.createElement('option');x.value=v;x.textContent=v;sel.appendChild(x)}
+function selects(){
+  for(const k of ['genotipo','solo','clima','dano']){
+    const el=$(k);limpar(el);option(el,'Todos');
+    [...new Set(finais.map(r=>r[k]))].sort().forEach(v=>option(el,v));
+  }
+}
+function tabela(){
+  selecionados=finais.filter(r=>['genotipo','solo','clima','dano'].every(k=>$(k).value==='Todos'||$(k).value===r[k]));
+  limpar($('colunas'));limpar($('linhas'));limpar($('metricas'));
+  COLS.forEach(k=>{const th=document.createElement('th');th.textContent=k;$('colunas').appendChild(th)});
+  selecionados.forEach(r=>{const tr=document.createElement('tr');COLS.forEach(k=>{
+    const td=document.createElement('td');td.textContent=['volume','biom_stem','biom_foliage','lai','stems_n'].includes(k)?fmt(r[k]):(r[k]??'');tr.appendChild(td)});$('linhas').appendChild(tr)});
+  const first=selecionados[0],metrics=$('metricas');
+  if(first){for(const [rot,col,unit] of [['Volume','volume','m³/ha'],['Folhas','biom_foliage','Mg/ha'],['IAF','lai','m²/m²'],['Densidade','stems_n','árv./ha']]){
+    const box=document.createElement('div');box.className='metric';
+    const label=document.createElement('small');label.textContent=rot;
+    const val=document.createElement('b');val.textContent=fmt(first[col]);
+    const unt=document.createElement('small');unt.textContent=unit;
+    box.append(label,val,unt);metrics.appendChild(box)}}
+  $('status').textContent=`${finais.length} cenários carregados; ${selecionados.length} visíveis. Os cartões refletem o primeiro cenário filtrado.`;
+  $('exportar').disabled=!selecionados.length;
+  const choice=$('cenario');const current=choice.value;limpar(choice);
+  selecionados.forEach(r=>option(choice,r.id));
+  if(selecionados.some(r=>r.id===current))choice.value=current;
+  plot();
+}
+function plot(){
+  const svg=$('grafico');limpar(svg);const id=$('cenario').value;
+  const rows=serie.filter(r=>r.cenario_id===id).sort((a,b)=>String(a.ano_mes).localeCompare(String(b.ano_mes)));
+  const NS='http://www.w3.org/2000/svg';function el(tag,attrs,text){
+    const q=document.createElementNS(NS,tag);Object.entries(attrs||{}).forEach(([k,v])=>q.setAttribute(k,v));
+    if(text!=null)q.textContent=text;svg.appendChild(q);return q}
+  el('rect',{x:0,y:0,width:800,height:300,fill:'#fcfdfb'});
+  if(rows.length<2){el('text',{x:30,y:42},'Carregue as séries mensais para exibir as curvas.');return}
+  const curves=[['volume','#226748'],['biom_foliage','#d38337'],['lai','#596fc1']];
+  curves.forEach(([key,color],j)=>{
+    const vals=rows.map(r=>+r[key]);const max=Math.max(...vals.filter(Number.isFinite),1);
+    const points=vals.map((v,i)=>[30+i*735/(vals.length-1),270-245*v/max]).filter(x=>x.every(Number.isFinite));
+    el('polyline',{points:points.map(a=>a.join(',')).join(' '),fill:'none',stroke:color,'stroke-width':2});
+    el('text',{x:40+j*185,y:20,fill:color},`${key} (máx. ${fmt(max,1)})`);
+  });
+  el('line',{x1:30,x2:765,y1:270,y2:270,stroke:'#7c9b86'});
+  el('text',{x:31,y:291},rows[0].ano_mes);
+  el('text',{x:700,y:291},rows[rows.length-1].ano_mes);
+}
+$('interacoes').addEventListener('change',async()=>{
+  const rows=await lerArquivo('interacoes'),tbody=$('linhasInteracoes');
+  limpar(tbody);
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    for(const k of ['ssp','dano','variavel','interacao_tripla_genotipo_solo_clima','modulacao_adicional_por_dano']){
+      const td=document.createElement('td');
+      td.textContent=k.startsWith('interacao_')||k.startsWith('modulacao_')?fmt(r[k],3):(r[k]??'');
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+});
+$('fenotipos').addEventListener('change',async()=>{
+  try{
+    const rows=await lerArquivo('fenotipos');
+    const wanted=['talhao_id','genotipo','solo','ano_mes','variavel','valor','desvio_sazonal','origem'];
+    if(rows.length&&wanted.some(k=>!(k in rows[0])))throw Error('CSV fora do padrão do importador GEDI');
+    const tbody=$('linhasFenotipos');limpar(tbody);
+    rows.slice(0,800).forEach(r=>{
+      const tr=document.createElement('tr');
+      wanted.forEach(k=>{
+        const td=document.createElement('td');
+        td.textContent=['valor','desvio_sazonal'].includes(k)?fmt(r[k],3):(r[k]??'');
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    $('fenotipoStatus').textContent=rows.length+' registros remotos carregados; até 800 linhas exibidas. Esses sinais não identificam pragas automaticamente.';
+  }catch(e){$('fenotipoStatus').textContent='Falha ao importar fenotipagem: '+e.message}
+});
+for(const id of ['genotipo','solo','clima','dano'])$(id).addEventListener('change',tabela);
+$('cenario').addEventListener('change',plot);
+async function carregar(){
+  try{finais=await lerArquivo('finais');serie=await lerArquivo('mensal');
+    if(!finais.length){$('status').textContent='Selecione um CSV de resultados válido.';return}
+    const absent=COLS.filter(k=>!(k in finais[0]));if(absent.length)throw Error('Campos ausentes: '+absent.join(','));
+    $('filtros').hidden=false;selects();tabela();
+  }catch(e){$('status').textContent='Erro de importação: '+e.message}
+}
+$('finais').addEventListener('change',carregar);
+$('mensal').addEventListener('change',carregar);
+function baixar(name,text,type){
+  const url=URL.createObjectURL(new Blob([text],{type}));
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
+}
+$('exportar').addEventListener('click',()=>{
+  const cab=COLS.join(',');
+  const content=selecionados.map(r=>COLS.map(k=>'"'+String(r[k]??'').replaceAll('"','""')+'"').join(',')).join('\n');
+  baixar('akademia_cenarios_filtrados.csv',cab+'\n'+content+'\n','text/csv;charset=utf-8');
+});
+$('addPraga').addEventListener('click',()=>{
+  const a=$('agente').value.trim(),f=$('fontePraga').value.trim();
+  const n=+$('idade').value,d=+$('percent').value;
+  if(!a||!f||!Number.isInteger(n)||n<1||n>84||!Number.isFinite(d)||d<0||d>=100){
+    $('statusconfig').textContent='Informe agente, fonte, idade 1–84 e intensidade menor que 100%.';return}
+  ataques.push({id:'dano_'+(ataques.length+1),agente:a,fonte:f,classificacao:'hipotese',
+    eventos:[{tipo:$('mecanismo').value,idade_meses:n,fracao:d/100}]});
+  $('pragasLista').textContent=ataques.map(x=>`${x.id}: ${x.agente}, ${x.eventos[0].tipo} ${fmt(x.eventos[0].fracao*100)}% aos ${x.eventos[0].idade_meses} meses`).join(' | ');
+  $('statusconfig').textContent='Evento adicionado. A origem e a hipótese permanecem no JSON.';
+});
+$('baixarConfig').addEventListener('click',()=>{
+ try{
+  const required=['lat','lon','fonteLocal','dens','fonteDens','fr','fonteFr','cadAreia','fonteAreia','cadArgila','fonteArgila','g1','fonteG1','g2','fonteG2','periodoBase','periodoFuturo'];
+  const missing=required.filter(k=>!$(k).value.trim());
+  if(missing.length)throw Error('Campos obrigatórios ausentes: '+missing.join(', '));
+  const numeric=['lat','lon','dens','fr','cadAreia','cadArgila'];
+  if(numeric.some(k=>!Number.isFinite(+$(k).value)))throw Error('Números inválidos');
+  if(+$('fr').value<0||+$('fr').value>1||+$('dens').value<=0||+$('cadAreia').value<=0||+$('cadArgila').value<=0)throw Error('Valores de solo/densidade/FR fora do intervalo');
+  const c={titulo:'Akademia - experimento integrado',sitio:{id:'referencia_regional_triangulo_mineiro',
+    latitude:+$('lat').value,longitude:+$('lon').value,fonte:$('fonteLocal').value},
+    plantio:'2015-01',idade_final_meses:84,densidade_inicial_ha:+$('dens').value,
+    fonte_densidade:$('fonteDens').value,fertilidade_fr:+$('fr').value,fonte_fr:$('fonteFr').value,
+    fracao_agua_inicial:1,
+    genotipos:[{id:'G1',codigo_material:$('g1').value,fonte_parametros:$('fonteG1').value,classe_tolerancia:'nao_verificada'},
+    {id:'G2',codigo_material:$('g2').value,fonte_parametros:$('fonteG2').value,classe_tolerancia:'nao_verificada'}],
+    solos:[{id:'arenoso',soil_class:1,cad_mm:+$('cadAreia').value,fonte:$('fonteAreia').value},
+      {id:'argiloso',soil_class:4,cad_mm:+$('cadArgila').value,fonte:$('fonteArgila').value}],
+    clima:{historico_csv:'clima_historico_mensal.csv',deltas_climbra_csv:'deltas_climbra_mensais.csv',
+      fonte_climbra:'CLIMBra — Ballarin et al. (2023), doi:10.1038/s41597-023-01956-z; conferir modelos e célula',
+      periodo_referencia:$('periodoBase').value,periodo_futuro:$('periodoFuturo').value,
+      geadas:'dias_futuros_no_delta'},pragas:ataques};
+  baixar('experimento_integrado.json',JSON.stringify(c,null,2),'application/json;charset=utf-8');
+  $('statusconfig').textContent='Configuração exportada. Falta conferir a procedência dos parâmetros científicos e fornecer os CSVs climáticos públicos.';
+ }catch(e){$('statusconfig').textContent='Verifique: '+e.message}
+});
+</script></body></html>

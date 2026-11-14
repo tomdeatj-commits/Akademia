@@ -44,7 +44,7 @@ def ajust(r):
     return round(100 * (1 - (r.valor_tratamento / r.valor_controle) / (b.valor_tratamento / b.valor_controle)), 3)
 d["L_obs_pct_ajustado_linha_base"] = d.apply(ajust, axis=1)
 d["tipo_valor"] = "controle/tratamento transcritos da tabela; perdas calculadas"
-d["aplicabilidade"] = d.study_id.map({"Bertulio_2008": "híbridos de E. urophylla: validação externa secundária, não local",
+d["aplicabilidade"] = d.study_id.map({"Bertulio_2008": "híbridos de E. urophylla: calibração e teste interno (mesmo experimento), não independente",
                                       "Matrangolo_2010": "E. grandis: plausibilidade biológica (transferência taxonômica)"})
 d.to_csv("dados_tratamentos_observados_verificado.csv", index=False)
 pd.set_option("display.width", 220)
