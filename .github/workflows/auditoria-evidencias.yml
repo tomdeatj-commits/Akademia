@@ -1,0 +1,26 @@
+name: Auditoria de evidências científicas
+on:
+  push:
+    branches:
+      - 'audit/**'
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  evidencias:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Testes unitários da auditoria e publicação segura
+        run: python3 -m unittest discover -s ferramentas -p 'test_auditar_evidencias.py' -v
+      - name: Conferir dados observados e confronto Oliveira
+        run: python3 ferramentas/auditar_evidencias.py --output auditoria_final/relatorio_evidencias.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-auditoria-evidencias
+          path: auditoria_final/relatorio_evidencias.json
+          if-no-files-found: ignore
