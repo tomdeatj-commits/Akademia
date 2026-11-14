@@ -41,3 +41,6 @@
 - 02/11: ressalvas do parecer reduzidas a 1 (persistência das perdas após desfolha total precoce, Matrangolo). TCC VERSÃO FINAL v2, 35 p.; auditoria 506/506.
 - 02/11 (tarde): VERSÃO FINAL v3 (37 p.) — dossel corrigido, U de curta duração, teste independente que separa as versões; auditoria 528/528. Ressalva única: persistência das perdas após desfolha total precoce (Matrangolo).
 - 02/11 (16h): VERSÃO FINAL v4 com perspectivas na conclusão; passagem de bastão para o Astra (PASSAGEM_ASTRA.md).
+
+- 14/11/2026 — Auditoria 03 (fork/branch de trabalho): revisão de 24 registros numéricos e confronto externo pontual Oliveira; resultados aritméticos coerentes no CSV/JSON existente; distinção corrigida Bertulio (calibração e teste do mesmo experimento) vs Oliveira/Matrangolo (confrontos externos). Criados auditor de evidências, testes unitários e workflow CI. Pipeline não publica em `main` por padrão nem com `--publish`.
+- Pendente da Auditoria 03: confirmar o workflow GitHub Actions no PR, reexecutar pipeline científico completo no checkout, reconferir as tabelas dos artigos originais, corrigir a persistência em longo prazo apenas com mecanismo e fonte sustentados, harmonizar TCC v8 com código/memória do fork, regenerar passagem de bastão.
