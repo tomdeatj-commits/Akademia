@@ -72,7 +72,8 @@ def rodar(etapa):
             sys.exit(r.returncode)
     print(f"[{etapa}] ok em {time.time() - t0:.0f} s")
     if etapa not in ("passagem", "verificar", "testes", "evidencias"):
-        subprocess.run([PY, "ferramentas/gerar_passagem.py"], cwd=RAIZ)
+        subprocess.run([PY, "ferramentas/gerar_passagem.py"], cwd=RAIZ, check=True)
+    if "--publish" in sys.argv[1:]:
         commit(f"pipeline: etapa {etapa} concluída")
 
 
