@@ -35,3 +35,9 @@ presumidos na demonstração.**
 
 ## Recorte territorial da proposta aprovada
 O estudo genótipo × solo × clima usa a **região publicamente documentada de atuação da LD Celulose**, sem presumir talhões, clones, análises de solo ou inventários da empresa. Ver [protocolo territorial e de dados secundários](docs/ESCOPO_TCC_LD_REGIONAL.md). A fenotipagem regional sem identificação genética é tratada como contexto, não validação.
+
+
+## Planejamento e auditoria do projeto
+
+- [Mapa mestre do TCC II e da Akademia](docs/PLANO_MESTRE_TCC_AKADEMIA.md) — objetivos, frentes, sequência crítica, dependências e critérios de conclusão.
+- [Matriz de auditoria](docs/MATRIZ_AUDITORIA.md) — evidência exigida por frente, bloqueios conhecidos, estados e modelo de registro.
