@@ -20,9 +20,9 @@ Os cenários **sem danos** continuam sendo exatamente 12. Se você cadastrar doi
 ## Como executar usando dados reais
 
 ### 1. Confirmar as bases do experimento
-Preencha uma cópia de `config.modelo.json` com a coordenada representativa do talhão da LD Celulose, a fonte, duas classes de textura, CAD do solo em mm, densidade inicial, FR, e os parâmetros de **dois genótipos com contraste comprovado**.
+Preencha uma cópia de `config.modelo.json` com uma coordenada regional de referência na área de atuação publicamente descrita da LD Celulose, a fonte, duas classes de textura, CAD do solo em mm, densidade inicial, FR, e os parâmetros de **dois genótipos com contraste comprovado**.
 
-Os códigos `A1` e `C5` do modelo são referências históricas que já estão no projeto (Caldeira 2020 / Borges 2009). **NÃO são identificação, parametrização nem prova de tolerância dos dois clones da LD Celulose.** Se os genótipos reais forem outros, seus 82 parâmetros precisam ser cadastrados com rastreabilidade no catálogo do motor antes da simulação.
+Os códigos `A1` e `C5` do modelo são referências históricas que já estão no projeto (Caldeira 2020 / Borges 2009). **NÃO são identificação de plantios, nem prova de tolerância, nem materiais atribuídos à LD Celulose.** O contraste genético depende de dois conjuntos de parâmetros publicados e evidência de tolerância; caso sejam outros materiais, seus 82 parâmetros precisam ser cadastrados com rastreabilidade antes da simulação.
 
 ### 2. Preparar clima de entrada
 Arquivo `clima_historico_mensal.csv`: colunas `year,month,tmp_min,tmp_max,prcp,srad,frost_days` cobrindo o plantio, a inicialização do modelo e o fim dos sete anos. Temperaturas em °C, chuva mensal em mm, radiação média diária MJ m⁻² d⁻¹, geadas em dias/mês.
@@ -81,7 +81,7 @@ O script retorna, por talhão/mês com pixels válidos:
 - Sentinel-2: NDVI e NDRE (sinais espectrais, não diagnósticos de pragas).
 
 ```bash
-python3 sensoriamento/importar_gee.py --sitio-id ld_celulose_talhao \
+python3 sensoriamento/importar_gee.py --sitio-id referencia_regional_triangulo_mineiro \
   --saida fenotipagem/ gedi_*.csv
 ```
 
@@ -94,8 +94,8 @@ Execute `python3 plataforma/construir.py`. Abra `plataforma/integrado.html` ou `
 
 ## Faltas reais antes de declarar resultados da proposta
 
-1. Delimitação/coordenada de plantio e autorização de uso dos talhões da LD.
-2. Identificação dos dois genótipos, medições de tolerância térmica/hídrica e parametrização com fonte.
+1. Delimitação de uma referência geográfica pública na região de atuação da LD, sem atribuir ponto a fazenda, clone ou talhão da empresa.
+2. Identificação de dois materiais publicados com diferenças parametrizadas e evidência de tolerância térmica/hídrica; não depender de informações internas da empresa.
 3. CAD, textura e profundidade medidas/derivadas para os dois solos.
 4. Séries CLIMBra efetivas no local, metadados GCM/SSP, períodos e deltas.
 5. Confronto independente com r3PG/R e fenotipagem de campo compatível.
