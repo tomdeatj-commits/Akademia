@@ -23,6 +23,17 @@ from clones import MATERIAIS, params  # noqa:E402
 from threepg_pjs import run_3pg_pjs  # noqa:E402
 
 VARS=("volume","biom_stem","biom_foliage","biom_root","lai","dbh","height","stems_n","asw")
+UNIDADES_COMPATIVEIS={
+    "volume":{"m3/ha","m³/ha"},
+    "biom_stem":{"Mg/ha","t/ha"},
+    "biom_foliage":{"Mg/ha","t/ha"},
+    "biom_root":{"Mg/ha","t/ha"},
+    "lai":{"m2/m2","m²/m²"},
+    "dbh":{"cm"},"height":{"m"},
+    "stems_n":{"arvores/ha","árvores/ha"},
+    "asw":{"mm"}
+}
+
 COLUNAS_CLIMA=("year","month","tmp_min","tmp_max","prcp","srad","frost_days")
 
 
@@ -147,7 +158,7 @@ def confrontar_fenotipos(mensal,caminho,site_id):
         b["tipo_confronto"]="proxy_sem_equivalencia"
         if str(item["sitio_id"])!=str(site_id):
             b["tipo_confronto"]="local_incompativel"
-        elif item["origem"]=="campo" and str(item["comparavel"]).lower() in ("sim","true","1") and item["variavel"] in VARS:
+        elif item["origem"]=="campo" and str(item["comparavel"]).lower() in ("sim","true","1") and item["variavel"] in UNIDADES_COMPATIVEIS and item["unidade"] in UNIDADES_COMPATIVEIS[item["variavel"]]:
             sub=mensal[(mensal.genotipo==item["genotipo"]) &
                       (mensal.solo==item["solo"]) & (mensal.clima=="historico") &
                       (mensal.dano=="controle") & (mensal.ano_mes==str(item["ano_mes"]))]
