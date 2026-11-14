@@ -36,7 +36,7 @@ class FontesIntegradasTeste(unittest.TestCase):
             self.assertTrue((dados.tipo_evidencia=="proxy_indireto_sem_ajuste").all())
             self.assertEqual(len(resumo),2)
 
-    def test_arquivo_gee_sem_sitio_generico_recusado(self):
+    def test_arquivo_gee_regional_sem_genotipo_aceito_apenas_como_proxy(self):
         x=pd.DataFrame([dict(talhao_id="T",genotipo="",
             solo="arenoso",ano_mes="2022-01",produto="GEDI_L4A",
             variavel="agbd",valor=120,n_pixels_validos=2,
@@ -44,7 +44,11 @@ class FontesIntegradasTeste(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             f=Path(d)/"export.csv"
             x.to_csv(f,index=False)
-            with self.assertRaises(ValueError): integrar([f],"local")
+            dados,_=integrar([f],"recorte_regional")
+            self.assertEqual(len(dados),1)
+            self.assertTrue(pd.isna(dados.iloc[0]["genotipo"]))
+            self.assertEqual(dados.iloc[0]["escopo"],"area_referencia_sem_identidade_genetica")
+            self.assertEqual(dados.iloc[0]["comparavel"],"nao")
 
     def test_deltas_ensemble_com_periodos_e_fonte(self):
         records=[]
