@@ -142,6 +142,48 @@ def contrastes(finais):
     return pd.DataFrame(out)
 
 
+
+def interacoes(finais):
+    """Contrastes fatoriais, NÃO testes de significância nem efeitos causais observados.
+    A interação tripla é a diferença de mudança de vantagem G2-G1 entre solos.
+    """
+    base=finais.set_index(["genotipo","solo","clima","dano"])
+    danos=sorted(finais.dano.unique().tolist())
+    metrics=("volume","biom_stem","biom_foliage","lai","stems_n")
+    def valor(g,so,clima,dano,var):
+        return float(base.loc[(g,so,clima,dano),var])
+    def vantagem(so,clima,dano,var):
+        return valor("G2",so,clima,dano,var)-valor("G1",so,clima,dano,var)
+    out=[]
+    for dano in danos:
+        for ssp in CLIMAS[1:]:
+            for var in metrics:
+                areia_hist=vantagem("arenoso","historico",dano,var)
+                areia_fut=vantagem("arenoso",ssp,dano,var)
+                argila_hist=vantagem("argiloso","historico",dano,var)
+                argila_fut=vantagem("argiloso",ssp,dano,var)
+                delta_areia=areia_fut-areia_hist
+                delta_argila=argila_fut-argila_hist
+                controle=(
+                    vantagem("argiloso",ssp,"controle",var)-
+                    vantagem("argiloso","historico","controle",var)-
+                    vantagem("arenoso",ssp,"controle",var)+
+                    vantagem("arenoso","historico","controle",var)
+                )
+                tripla=delta_argila-delta_areia
+                out.append(dict(dano=dano,ssp=ssp,variavel=var,
+                    vantagem_G2_G1_historico_arenoso=areia_hist,
+                    vantagem_G2_G1_futuro_arenoso=areia_fut,
+                    vantagem_G2_G1_historico_argiloso=argila_hist,
+                    vantagem_G2_G1_futuro_argiloso=argila_fut,
+                    mudanca_vantagem_arenoso=delta_areia,
+                    mudanca_vantagem_argiloso=delta_argila,
+                    interacao_tripla_genotipo_solo_clima=tripla,
+                    modulacao_adicional_por_dano=tripla-controle,
+                    interpretacao="contraste modelado; sem teste de significância"))
+    return pd.DataFrame(out)
+
+
 def confrontar_fenotipos(mensal,caminho,site_id):
     """Compara somente campo mensurado e declaração explícita de compatibilidade.
     GEDI e índices espectrais: proxy sem diferença automática com 3-PG."""
@@ -184,6 +226,7 @@ def executar(arquivo_config,dir_saida):
     meteo={ssp:perturbar(hist,d,ssp,c["clima"]["geadas"]) for ssp in CLIMAS}
     mensal,finais=simular(c,plano,meteo)
     fatores=contrastes(finais)
+    factorial=interacoes(finais)
     obs=confrontar_fenotipos(mensal,resolve(c.get("fenotipagem_csv")) if c.get("fenotipagem_csv") else None,c["sitio"]["id"])
     destino=Path(dir_saida)
     destino.mkdir(parents=True,exist_ok=True)
@@ -191,6 +234,7 @@ def executar(arquivo_config,dir_saida):
     mensal.to_csv(destino/"simulacoes_mensais.csv",index=False)
     finais.to_csv(destino/"resultados_84_meses.csv",index=False)
     fatores.to_csv(destino/"contrastes_genotipo_solo_clima_pragas.csv",index=False)
+    factorial.to_csv(destino/"interacoes_genotipo_solo_clima.csv",index=False)
     if len(obs): obs.to_csv(destino/"confronto_fenotipagem.csv",index=False)
     relatorio=dict(status="executado_sem_validacao_biologica",n_base=12,n_cenarios=len(plano),
                    n_pragas=len(c.get("pragas",[])),n_fenotipos=len(obs),
