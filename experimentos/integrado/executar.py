@@ -192,7 +192,13 @@ def confrontar_fenotipos(mensal,caminho,site_id):
     obrig=("genotipo","solo","ano_mes","variavel","valor","unidade","fonte","origem","comparavel","sitio_id")
     falta=set(obrig)-set(d)
     if falta: raise ValueError(f"Fenotipagem sem colunas: {sorted(falta)}")
-    if d[list(obrig)].isna().any().any(): raise ValueError("Fenotipagem sem fonte/identificação completa")
+    essenciais=("ano_mes","variavel","valor","unidade","fonte","origem","sitio_id")
+    if d[list(essenciais)].isna().any().any():
+        raise ValueError("Fenotipagem sem dados essenciais de data, fonte, variável ou local")
+    # GEDI/Sentinel podem ter genótipo/solo desconhecidos quando o polígono é regional.
+    campo=d[d.origem=="campo"]
+    if campo[["genotipo","solo"]].isna().any().any():
+        raise ValueError("Confronto de inventário de campo exige genótipo e solo identificados")
     regs=[]
     for item in d.to_dict("records"):
         b=dict(item)
