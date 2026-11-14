@@ -56,7 +56,7 @@ class RastreabilidadeTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             raiz = Path(tmp)
             (raiz / ".git").mkdir()
-            fake = subprocess.CompletedProcess([], 0, stdout="main\\n")
+            fake = subprocess.CompletedProcess([], 0, stdout="main\n")
             with patch.object(pipeline, "RAIZ", raiz), \
                     patch.object(pipeline.sys, "argv", ["pipeline.py", "--publish", "verificar"]), \
                     patch.object(pipeline.subprocess, "run", return_value=fake) as run:
