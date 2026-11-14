@@ -56,6 +56,18 @@ def validar_config(c):
           "Fonte e períodos climático-base e futuro são obrigatórios")
     exigir(clim.get("geadas") in ("dias_futuros_no_delta", "historico_fixo_com_ressalva"),
           "Defina método de dias de geada nos cenários futuros")
+    comp=c.get("compensacao")
+    if comp is not None:
+        exigir(isinstance(comp,dict) and comp.get("modo")=="parametros_explicitos",
+              "Compensação deve ser objeto com modo parametros_explicitos")
+        exigir(bool(comp.get("fonte")), "Compensação requer fonte/protocolo")
+        for nome,lo,hi in (("U",1.0,2.0),("gam",0.0,1.0),("a",0.0,1.0)):
+            v=comp.get(nome)
+            exigir(isinstance(v,(int,float)) and not isinstance(v,bool) and math.isfinite(v) and lo<=v<=hi,
+                  f"Compensação {nome} fora do domínio")
+        um=comp.get("u_meses")
+        exigir(um is None or (isinstance(um,int) and um>=1),
+              "Compensação u_meses deve ser inteiro positivo ou nulo")
     for p in c.get("pragas",[]):
         exigir(bool(p.get("id") and p.get("agente") and p.get("fonte")),
               "Cada cenário de dano exige id, agente e fonte")
