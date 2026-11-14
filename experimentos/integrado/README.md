@@ -110,3 +110,6 @@ Execute `python3 plataforma/construir.py`. Abra `plataforma/integrado.html` ou `
 - GEDI L2B: <https://developers.google.com/earth-engine/datasets/catalog/LARSE_GEDI_GEDI02_B_002_MONTHLY>
 - GEDI L4A: <https://developers.google.com/earth-engine/datasets/catalog/LARSE_GEDI_GEDI04_A_002_MONTHLY>
 - Sentinel-2: <https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED>
+
+### Regra territorial vigente
+A empresa LD Celulose fornece apenas referência regional pública no escopo atual; **nenhum fornecimento de dados foi acordado ou presumido**. O experimento deve ser preparado com fontes científicas secundárias e com uma coordenada de referência cuja origem não seja atribuída a talhão empresarial. A coleta ou obtenção futura de dados da LD exigirá autorização. O importador GEDI/Sentinel aceita genótipo/solo em branco para áreas regionais e, nesse caso, não realiza confronto fenotípico por material. Ver [protocolo territorial](../../docs/ESCOPO_TCC_LD_REGIONAL.md).
