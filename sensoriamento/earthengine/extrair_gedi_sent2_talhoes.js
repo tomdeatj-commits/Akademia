@@ -1,8 +1,10 @@
 // Akademia | Exportação operacional GEDI + Sentinel-2 por talhão (Google Earth Engine).
-// Cole em https://code.earthengine.google.com/ e substitua o asset pelo SEU talhão.
+// Cole em https://code.earthengine.google.com/ e defina polígonos PÚBLICOS de referência.
+// Não use a designação 'talhão da LD' sem confirmação de localização e origem.
 // Executa 4 exportações CSV reais (L2A, L2B, L4A, Sentinel-2).
-// Sem asset, sem autenticação Earth Engine ou sem observações, NÃO produz valores.
-// GEDI footprint ≈ 25m e métricas observacionais não equivalem diretamente a saídas 3-PG.
+// Sem polígonos delimitados, autenticação Earth Engine e observações válidas, NÃO produz valores.
+// Os identificadores de área podem ser genéricos; NÃO atribua genótipo ou manejo empresarial por inferência.
+// GEDI footprint ≈ 25m: métricas remotas regionais NÃO identificam genótipos nem equivalem diretamente a saídas 3-PG.
 // Catálogos oficiais:
 // https://developers.google.com/earth-engine/datasets/catalog/LARSE_GEDI_GEDI02_A_002_MONTHLY
 // https://developers.google.com/earth-engine/datasets/catalog/LARSE_GEDI_GEDI02_B_002_MONTHLY
