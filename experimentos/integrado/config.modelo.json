@@ -1,0 +1,57 @@
+{
+  "titulo": "Interacao genotipo × textura do solo × clima + danos; modelo integrado da proposta aprovada",
+  "sitio": {
+    "id": "ld_celulose_talhao",
+    "latitude": null,
+    "longitude": null,
+    "fonte": "",
+    "altitude_m": 0
+  },
+  "plantio": "2015-01",
+  "idade_final_meses": 84,
+  "densidade_inicial_ha": null,
+  "fonte_densidade": "",
+  "fertilidade_fr": null,
+  "fonte_fr": "",
+  "fracao_agua_inicial": 1,
+  "genotipos": [
+    {
+      "id": "G1",
+      "codigo_material": "A1",
+      "fonte_parametros": "Caldeira et al. (2020), como referência estrutural; NÃO implica genótipo da LD Celulose",
+      "classe_tolerancia": "nao_verificada",
+      "fonte_tolerancia": ""
+    },
+    {
+      "id": "G2",
+      "codigo_material": "C5",
+      "fonte_parametros": "Borges (2009), como referência estrutural; NÃO implica genótipo da LD Celulose",
+      "classe_tolerancia": "nao_verificada",
+      "fonte_tolerancia": ""
+    }
+  ],
+  "solos": [
+    {
+      "id": "arenoso",
+      "soil_class": 1,
+      "cad_mm": null,
+      "fonte": ""
+    },
+    {
+      "id": "argiloso",
+      "soil_class": 4,
+      "cad_mm": null,
+      "fonte": ""
+    }
+  ],
+  "clima": {
+    "historico_csv": "clima_historico_mensal.csv",
+    "deltas_climbra_csv": "deltas_climbra_mensais.csv",
+    "fonte_climbra": "Ballarin et al. (2023), Scientific Data, doi:10.1038/s41597-023-01956-z; preencher período e GCMs dos arquivos realmente usados",
+    "periodo_referencia": "",
+    "periodo_futuro": "",
+    "geadas": "dias_futuros_no_delta"
+  },
+  "pragas": [],
+  "fenotipagem_csv": null
+}
