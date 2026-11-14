@@ -46,6 +46,10 @@ Os ataques são experiências de sensibilidade adicionais. GEDI, Sentinel-2 e me
 <div class="metrics" id="metricas" aria-live="polite"></div>
 <div class="scroll"><table id="tabela" aria-label="Resultados de cenários"><thead><tr id="colunas"></tr></thead><tbody id="linhas"></tbody></table></div>
 <p><button class="secondary" id="exportar" disabled>Exportar seleção CSV</button></p>
+<details><summary>Interação genótipo × solo × clima e modulação por pragas</summary>
+<label>Interações calculadas pelo motor<input type="file" id="interacoes" accept=".csv,text/csv"></label>
+<p class="note">A interação tripla é um contraste entre diferenças G2−G1, solos e climas. Não é teste de significância nem efeito observado em campo.</p>
+<div class="scroll"><table aria-label="Contrastes fatoriais"><thead><tr><th>SSP</th><th>Dano</th><th>Variável</th><th>Interação tripla</th><th>Modulação adicional pelo dano</th></tr></thead><tbody id="linhasInteracoes"></tbody></table></div></details>
 <details><summary>Curvas mensais do cenário selecionado</summary>
 <label>Identificador do cenário<select id="cenario"></select></label>
 <svg id="grafico" viewBox="0 0 800 300" role="img" aria-label="Curvas mensais por variável"></svg>
@@ -96,6 +100,9 @@ Os ataques são experiências de sensibilidade adicionais. GEDI, Sentinel-2 e me
 <div><b>Campo</b><div class="note">Inventários, medições de IAF, altura e volume com protocolo comparável alimentam o confronto.</div></div>
 </div>
 <p><a href="https://code.earthengine.google.com/" target="_blank" rel="noopener">Abrir o Code Editor do Earth Engine</a> · <a href="https://github.com/tomdeatj-commits/Akademia/tree/feature/gedi-earthengine-observacoes/sensoriamento">Ver extrator e importador no repositório</a></p>
+<label>Fenotipagem importada do Earth Engine (CSV)<input type="file" id="fenotipos" accept=".csv,text/csv"></label>
+<p id="fenotipoStatus" class="note" role="status">Nenhum CSV de fenotipagem carregado.</p>
+<div class="scroll"><table aria-label="Medições remotas por talhão"><thead><tr><th>Talhão</th><th>Genótipo</th><th>Solo</th><th>Mês</th><th>Variável</th><th>Valor</th><th>Desvio sazonal</th><th>Origem</th></tr></thead><tbody id="linhasFenotipos"></tbody></table></div>
 </section>
 </main>
 <footer class="note">Ferramenta de apoio à pesquisa. Resultados computacionais não constituem validação de campo. Fórmulas e parâmetros pertencem ao motor 3-PG preservado.</footer>
@@ -165,6 +172,37 @@ function plot(){
   el('text',{x:31,y:291},rows[0].ano_mes);
   el('text',{x:700,y:291},rows[rows.length-1].ano_mes);
 }
+$('interacoes').addEventListener('change',async()=>{
+  const rows=await lerArquivo('interacoes'),tbody=$('linhasInteracoes');
+  limpar(tbody);
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    for(const k of ['ssp','dano','variavel','interacao_tripla_genotipo_solo_clima','modulacao_adicional_por_dano']){
+      const td=document.createElement('td');
+      td.textContent=k.startsWith('interacao_')||k.startsWith('modulacao_')?fmt(r[k],3):(r[k]??'');
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  });
+});
+$('fenotipos').addEventListener('change',async()=>{
+  try{
+    const rows=await lerArquivo('fenotipos');
+    const wanted=['talhao_id','genotipo','solo','ano_mes','variavel','valor','desvio_sazonal','origem'];
+    if(rows.length&&wanted.some(k=>!(k in rows[0])))throw Error('CSV fora do padrão do importador GEDI');
+    const tbody=$('linhasFenotipos');limpar(tbody);
+    rows.slice(0,800).forEach(r=>{
+      const tr=document.createElement('tr');
+      wanted.forEach(k=>{
+        const td=document.createElement('td');
+        td.textContent=['valor','desvio_sazonal'].includes(k)?fmt(r[k],3):(r[k]??'');
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    $('fenotipoStatus').textContent=rows.length+' registros remotos carregados; até 800 linhas exibidas. Esses sinais não identificam pragas automaticamente.';
+  }catch(e){$('fenotipoStatus').textContent='Falha ao importar fenotipagem: '+e.message}
+});
 for(const id of ['genotipo','solo','clima','dano'])$(id).addEventListener('change',tabela);
 $('cenario').addEventListener('change',plot);
 async function carregar(){
@@ -202,7 +240,7 @@ $('baixarConfig').addEventListener('click',()=>{
   const missing=required.filter(k=>!$(k).value.trim());
   if(missing.length)throw Error('Campos obrigatórios ausentes: '+missing.join(', '));
   const numeric=['lat','lon','dens','fr','cadAreia','cadArgila'];
-  if(numeric.some(k=>!Number.isFinite(+$ (k).value)))throw Error('Números inválidos');
+  if(numeric.some(k=>!Number.isFinite(+$(k).value)))throw Error('Números inválidos');
   if(+$('fr').value<0||+$('fr').value>1||+$('dens').value<=0||+$('cadAreia').value<=0||+$('cadArgila').value<=0)throw Error('Valores de solo/densidade/FR fora do intervalo');
   const c={titulo:'Akademia - experimento integrado',sitio:{id:'ld_celulose_talhao',
     latitude:+$('lat').value,longitude:+$('lon').value,fonte:$('fonteLocal').value},
