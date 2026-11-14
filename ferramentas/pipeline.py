@@ -63,6 +63,8 @@ def rodar(etapa):
         print(f"[{etapa}] $ {' '.join(cmd)}", flush=True)
         r = subprocess.run(cmd, cwd=CWD.get(etapa, RAIZ))
         if r.returncode != 0:
+            if etapa in ("verificar", "testes", "evidencias"):
+                sys.exit(r.returncode)
             print(f"[{etapa}] FALHOU (código {r.returncode}). A passagem de bastão foi atualizada com a falha registrada.")
             (RAIZ / "memoria/contexto_ativo.md").open("a", encoding="utf8").write(
                 f"\n- FALHA na etapa `{etapa}` ({time.strftime('%d/%m %H:%M')}): comando `{' '.join(cmd)}`.\n")
