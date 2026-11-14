@@ -32,3 +32,6 @@ dano/desfolha são simulações de sensibilidade opcionais, nunca evidência de 
 A análise produz o contraste triplo genótipo × solo × clima e sua modulação por ataques,
 com rastreabilidade. **Não há parâmetros, clima futuro nem fenotipagem reais da LD Celulose
 presumidos na demonstração.**
+
+## Recorte territorial da proposta aprovada
+O estudo genótipo × solo × clima usa a **região publicamente documentada de atuação da LD Celulose**, sem presumir talhões, clones, análises de solo ou inventários da empresa. Ver [protocolo territorial e de dados secundários](docs/ESCOPO_TCC_LD_REGIONAL.md). A fenotipagem regional sem identificação genética é tratada como contexto, não validação.
