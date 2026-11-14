@@ -17,6 +17,6 @@ jobs:
       - name: Instalar dependências do motor existente
         run: python3 -m pip install numpy pandas
       - name: Executar testes sintéticos do orquestrador integrado
-        run: python3 -m unittest discover -s experimentos/integrado -p 'test_cenarios_integrados.py' -v
+        run: python3 -m unittest discover -s experimentos/integrado -p 'test_*.py' -v
       - name: Verificar sintaxe de scripts de entrada
-        run: python3 -m py_compile experimentos/integrado/cenarios.py experimentos/integrado/executar.py
+        run: python3 -m py_compile experimentos/integrado/cenarios.py experimentos/integrado/executar.py experimentos/integrado/gerar_deltas_climbra.py sensoriamento/importar_gee.py
