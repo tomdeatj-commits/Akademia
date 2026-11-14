@@ -49,7 +49,18 @@ python3 experimentos/integrado/executar.py --config experimento_ld.json --modo p
 python3 experimentos/integrado/executar.py --config experimento_ld.json --modo executar --saida saida_ld/
 ```
 
-Saídas geradas: `matriz_cenarios.csv`, `simulacoes_mensais.csv`, `resultados_84_meses.csv`, `contrastes_genotipo_solo_clima_pragas.csv`, `manifesto_execucao.json`.
+Saídas geradas: `matriz_cenarios.csv`, `simulacoes_mensais.csv`, `resultados_84_meses.csv`, `contrastes_genotipo_solo_clima_pragas.csv`, `interacoes_genotipo_solo_clima.csv`, `manifesto_execucao.json`.
+
+A tabela `interacoes_genotipo_solo_clima.csv` responde explicitamente à pergunta aprovada:
+para cada SSP e dano, calcula a vantagem G2−G1 no solo arenoso e argiloso, sua mudança
+em relação ao histórico e o contraste de diferenças que caracteriza a interação tripla.
+`modulacao_adicional_por_dano` compara esse contraste sob ataque com o controle.
+São resultados do fatorial simulado, **sem inferência estatística nem validação de campo**.
+
+A compensação fisiológica é opcional: inclua no JSON o objeto
+`"compensacao":{"modo":"parametros_explicitos","U":...,"gam":...,"a":...,"u_meses":...,"fonte":"..."}`
+com **valores identificados na fonte**, caso queira habilitar a extensão já implementada.
+A calibração histórica de Bertulio continua sob auditoria e não é ativada automaticamente.
 
 O módulo executa a **porta Python já existente do 3-PGpjs**, não uma chamada direta ao R/r3PG. Para cumprir integralmente o método aprovado, ainda é necessário confrontar os controles e resultados com a implementação **r3PG em R**, com versão e commit registrados.
 
