@@ -69,6 +69,13 @@ class CenariosIntegradosTeste(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"fonte_tolerancia"):
             cenarios.validar_config(c)
 
+    def test_compensacao_requer_fonte(self):
+        c=configuracao()
+        c["compensacao"]={"modo":"parametros_explicitos","U":1.18,"gam":1.0,
+                           "a":0.625,"u_meses":1,"fonte":""}
+        with self.assertRaisesRegex(ValueError,"fonte"):
+            cenarios.validar_config(c)
+
     def test_nao_inventar_cad(self):
         c=configuracao()
         c["solos"][0]["cad_mm"]=None
@@ -126,6 +133,9 @@ class CenariosIntegradosTeste(unittest.TestCase):
             self.assertTrue((final["data_final"]=="2022-01-31").all())
             fatores=pd.read_csv(output/"contrastes_genotipo_solo_clima_pragas.csv")
             self.assertEqual(len(fatores),24*5)
+            interacoes=pd.read_csv(output/"interacoes_genotipo_solo_clima.csv")
+            self.assertEqual(len(interacoes),2*2*5)
+            self.assertTrue(interacoes.interacao_tripla_genotipo_solo_clima.notna().all())
             self.assertTrue((output/"simulacoes_mensais.csv").exists())
             self.assertEqual(resultado["status"],"executado_sem_validacao_biologica")
 
