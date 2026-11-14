@@ -98,7 +98,8 @@ def simular(c, plano, clima):
                         defoliation_events=eventos["desfolha"] or None,
                         efficiency_events=eventos["eficiencia"] or None,
                         mortality_events=eventos["mortalidade"] or None,
-                        compensation=None)
+                        compensation=({k:c["compensacao"][k] for k in ("U","gam","a","u_meses")}
+                                      if c.get("compensacao") is not None else None))
         if not len(out): raise RuntimeError(f'Simulação vazia: {row["id"]}')
         out=out.copy()
         out.insert(0,"cenario_id",row["id"])
