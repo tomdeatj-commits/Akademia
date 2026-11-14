@@ -20,3 +20,19 @@ jobs:
         run: python3 -m unittest discover -s experimentos/integrado -p 'test_*.py' -v
       - name: Verificar sintaxe de scripts de entrada
         run: python3 -m py_compile experimentos/integrado/cenarios.py experimentos/integrado/executar.py experimentos/integrado/gerar_deltas_climbra.py sensoriamento/importar_gee.py
+      - name: Verificar JavaScript da bancada integrada
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import subprocess
+          p=Path('plataforma/integrado.html')
+          blocks=re.findall(r'<script>(.*?)</script>', p.read_text(), re.S)
+          assert len(blocks)==1, 'Era esperado um bloco JS na bancada'
+          Path('/tmp/akademia_integrado.js').write_text(blocks[0])
+          subprocess.run(['node','--check','/tmp/akademia_integrado.js'],check=True)
+          PY
+      - name: Conferir geração reproduzível de páginas
+        run: |
+          python3 plataforma/construir.py
+          git diff --exit-code -- docs/index.html docs/integrado.html
